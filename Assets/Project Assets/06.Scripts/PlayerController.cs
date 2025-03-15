@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class PlayerController : MonoBehaviour
 
     private InputAction moveAction;
 
+    [SerializeField] private Transform cameraTransform;
+
     [SerializeField] private float playerHalfLength;
 
     [SerializeField] private float moveSpeed = 5f;
@@ -19,6 +22,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity = 9.81f;
 
     private Vector3 smoothedDirection;
+    private Vector3 camForward;
+    private Vector3 camRight;
+
     private float currentRunningSpeed = 0;
     private float currentMoveSpeed = 0f;
     private float acceleration = 10f;
@@ -27,14 +33,14 @@ public class PlayerController : MonoBehaviour
 
     private int isAnimEnd = 1;
     private int isNotSpecificAnimation = 1;
-    private bool canNextBehaviour = false;
+    private bool canNextBehaviour = true;
     private bool isGrounded = false;
 
     Coroutine Co_blockRoutine;
     Coroutine Co_attackRoutine;
     Coroutine Co_jumpRoutine;
 
-    public Vector3 direction { get; private set; }
+    public Vector3 inputDirection { get; private set; }
 
     void Awake()
     {
@@ -48,7 +54,8 @@ public class PlayerController : MonoBehaviour
         isGrounded = CheckToGrounded();
         anim.SetBool("IsGrounded", isGrounded);
 
-        if (isGrounded && !canNextBehaviour)
+        GetCameraDirectionExceptY();
+        if (isGrounded && canNextBehaviour)
         {
             HandleCharacterActions();
             UpdateMovement();
@@ -57,24 +64,18 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateMovement()
     {
-        bool isMoving = isNotSpecificAnimation == 1 && direction.magnitude > 0f;
-        bool canMovingAnimation = isAnimEnd == 1 && direction.magnitude > 0f;
+        bool isMoving = isNotSpecificAnimation == 1 && inputDirection.magnitude > 0f;
+        bool canMovingAnimation = isAnimEnd == 1 && inputDirection.magnitude > 0f;
 
         if (isMoving)
         {
-            // 이동 시 가속 적용
             currentMoveSpeed = Mathf.SmoothDamp(currentMoveSpeed, moveSpeed + currentRunningSpeed, ref velocityRef, 1f / acceleration);
         }
-        else if(isNotSpecificAnimation == 1 && (direction.magnitude > 0f || currentMoveSpeed > 0))
+        else //if(isNotSpecificAnimation == 1 && (inputDirection.magnitude > 0f || currentMoveSpeed > 0))
         {
-            // 키를 떼면 감속 적용
             currentMoveSpeed = Mathf.SmoothDamp(currentMoveSpeed, 0f, ref velocityRef, 1f / deceleration);
         }
 
-        //if (anim.GetCurrentAnimatorStateInfo(0).IsName("ani_Paladin_Walking") || anim.GetCurrentAnimatorStateInfo(0).IsName("ani_Paladin_Running"))
-        //{
-            
-        //}
         MovePlayer();
         CheckToRunning();
         UpdateMoveAnimation(canMovingAnimation);
@@ -91,17 +92,29 @@ public class PlayerController : MonoBehaviour
     {
         anim.SetBool("IsMove", canMovingAnimation);
 
-        smoothedDirection = Vector3.Lerp(smoothedDirection, direction.normalized * currentMoveSpeed, Time.deltaTime * 10f);
+        smoothedDirection = Vector3.Lerp(smoothedDirection, inputDirection.normalized * currentMoveSpeed, Time.deltaTime * 10f);
 
         anim.SetFloat("Horizontal", smoothedDirection.x);
         anim.SetFloat("Vertical", smoothedDirection.z);
+    }
+
+    private void GetCameraDirectionExceptY()
+    {
+        camForward = cameraTransform.forward;
+        camRight = cameraTransform.right;
+
+        camForward.y = 0;
+        camRight.y = 0;
+
+        camForward.Normalize();
+        camRight.Normalize();
     }
 
     public void OnMoveInput(InputAction.CallbackContext context)
     {
         Vector2 input = context.ReadValue<Vector2>();
 
-        direction = new Vector3(input.x, 0f, input.y);
+        inputDirection = new Vector3(input.x, 0, input.y);
     }
 
     bool CheckToGrounded()
@@ -111,11 +124,17 @@ public class PlayerController : MonoBehaviour
 
     void MovePlayer()
     {
-        Vector3 movement = direction.normalized * currentMoveSpeed * Time.deltaTime;
+        Vector3 movement = (camForward * inputDirection.z + camRight * inputDirection.x).normalized * currentMoveSpeed * Time.deltaTime;
         characterController.Move(movement);
 
-        anim.SetFloat("Horizontal", direction.normalized.x);
-        anim.SetFloat("Vertical", direction.normalized.z);
+        if (movement.magnitude > 0 && movement != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(movement);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+        }
+
+        anim.SetFloat("Horizontal", inputDirection.normalized.x);
+        anim.SetFloat("Vertical", inputDirection.normalized.z);
     }
 
     private void HandleCharacterActions()
@@ -131,33 +150,36 @@ public class PlayerController : MonoBehaviour
     IEnumerator ShieldBlockingRoutine()
     {
         isAnimEnd = 0;
-        canNextBehaviour = true;
+        canNextBehaviour = false;
         anim.SetTrigger("ToBlocking");
 
         yield return new WaitUntil(() => isAnimEnd == 1);
-        canNextBehaviour = false;
+        canNextBehaviour = true;
     }
 
     IEnumerator AttackRoutine()
     {
         isAnimEnd = 0;
-        canNextBehaviour = true;
+        canNextBehaviour = false;
         anim.SetTrigger($"ToAttack_{Random.Range(1, 4)}");
 
         yield return new WaitUntil(() => isAnimEnd == 1);
-        canNextBehaviour = false;
+        canNextBehaviour = true;
     }
 
     IEnumerator JumpRoutine()
     {
         isAnimEnd = 0;
-        canNextBehaviour = true;
+        canNextBehaviour = false;
         anim.SetTrigger("ToJump");
 
         yield return new WaitUntil(() => isAnimEnd == 1);
-        canNextBehaviour = false;
+        canNextBehaviour = true;
     }
 
     public void SetAnimEnd(int num) => isAnimEnd = num;
-    public void SetIsNotSpecificAnimation(int num) => isNotSpecificAnimation = num;
+    public void SetIsNotSpecificAnimation(int num)
+    {
+        isNotSpecificAnimation = num;
+    }
 }

@@ -73235,7 +73235,7 @@ AnimationClip:
     floatParameter: 0
     intParameter: 1
     messageOptions: 0
-  - time: 1.9333333
+  - time: 2
     functionName: SetIsNotSpecificAnimation
     data: 
     objectReferenceParameter: {fileID: 0}

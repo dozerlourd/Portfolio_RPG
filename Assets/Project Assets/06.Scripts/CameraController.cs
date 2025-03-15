@@ -22,13 +22,6 @@ public class CameraController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    //public void OnMoveInput(InputAction.CallbackContext context)
-    //{
-    //    Vector2 input = context.ReadValue<Vector2>();
-    //    print(input);
-    //    //direction = new Vector3(input.x, 0f, input.y);
-    //}
-
     public void OnLook(InputAction.CallbackContext context)
     {
         lookInput = context.ReadValue<Vector2>();
