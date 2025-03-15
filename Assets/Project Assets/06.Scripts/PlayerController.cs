@@ -18,14 +18,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce = 5f;
     [SerializeField] private float gravity = 9.81f;
 
+    private Vector3 smoothedDirection;
     private float currentRunningSpeed = 0;
     private float currentMoveSpeed = 0f;
-    private float maxMoveSpeed = 2f;
     private float acceleration = 10f;
     private float deceleration = 20f;
     private float velocityRef = 0f;     // Reference value of SmoothDamp
 
-    private int isAnimEnd = 0;
+    private int isAnimEnd = 1;
     private int isNotSpecificAnimation = 1;
     private bool canNextBehaviour = false;
     private bool isGrounded = false;
@@ -57,10 +57,13 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateMovement()
     {
-        if (isNotSpecificAnimation == 1 && direction.magnitude > 0f)
+        bool isMoving = isNotSpecificAnimation == 1 && direction.magnitude > 0f;
+        bool canMovingAnimation = isAnimEnd == 1 && direction.magnitude > 0f;
+
+        if (isMoving)
         {
             // 이동 시 가속 적용
-            currentMoveSpeed = Mathf.SmoothDamp(currentMoveSpeed, maxMoveSpeed + currentRunningSpeed, ref velocityRef, 1f / acceleration);
+            currentMoveSpeed = Mathf.SmoothDamp(currentMoveSpeed, moveSpeed + currentRunningSpeed, ref velocityRef, 1f / acceleration);
         }
         else if(isNotSpecificAnimation == 1 && (direction.magnitude > 0f || currentMoveSpeed > 0))
         {
@@ -68,9 +71,13 @@ public class PlayerController : MonoBehaviour
             currentMoveSpeed = Mathf.SmoothDamp(currentMoveSpeed, 0f, ref velocityRef, 1f / deceleration);
         }
 
+        //if (anim.GetCurrentAnimatorStateInfo(0).IsName("ani_Paladin_Walking") || anim.GetCurrentAnimatorStateInfo(0).IsName("ani_Paladin_Running"))
+        //{
+            
+        //}
         MovePlayer();
         CheckToRunning();
-        UpdateMoveAnimation();
+        UpdateMoveAnimation(canMovingAnimation);
     }
 
     private void CheckToRunning()
@@ -80,19 +87,20 @@ public class PlayerController : MonoBehaviour
         currentRunningSpeed = isRunning ? runningSpeed : 0;
     }
 
-    private void UpdateMoveAnimation()
+    private void UpdateMoveAnimation(bool canMovingAnimation)
     {
-        bool isMoving = direction.magnitude > 0f && isNotSpecificAnimation == 1;
-        anim.SetBool("IsMove", isMoving);
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("ani_Paladin_Walking") || anim.GetCurrentAnimatorStateInfo(0).IsName("ani_Paladin_Running"))
-        {
-            anim.SetFloat("MoveSpeed", Mathf.Max(currentMoveSpeed / maxMoveSpeed + currentRunningSpeed, 0.3f));
-        }
+        anim.SetBool("IsMove", canMovingAnimation);
+
+        smoothedDirection = Vector3.Lerp(smoothedDirection, direction.normalized * currentMoveSpeed, Time.deltaTime * 10f);
+
+        anim.SetFloat("Horizontal", smoothedDirection.x);
+        anim.SetFloat("Vertical", smoothedDirection.z);
     }
 
     public void OnMoveInput(InputAction.CallbackContext context)
     {
         Vector2 input = context.ReadValue<Vector2>();
+
         direction = new Vector3(input.x, 0f, input.y);
     }
 
@@ -105,6 +113,9 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 movement = direction.normalized * currentMoveSpeed * Time.deltaTime;
         characterController.Move(movement);
+
+        anim.SetFloat("Horizontal", direction.normalized.x);
+        anim.SetFloat("Vertical", direction.normalized.z);
     }
 
     private void HandleCharacterActions()
