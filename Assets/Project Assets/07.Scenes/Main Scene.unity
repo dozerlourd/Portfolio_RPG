@@ -3044,10 +3044,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1523706855}
-  - component: {fileID: 1523706852}
   - component: {fileID: 1523706854}
   - component: {fileID: 1523706853}
   - component: {fileID: 1523706856}
+  - component: {fileID: 1523706860}
+  - component: {fileID: 1523706859}
+  - component: {fileID: 1523706858}
+  - component: {fileID: 1523706857}
+  - component: {fileID: 1523706861}
   m_Layer: 8
   m_Name: Paladin Knight
   m_TagString: t_Player
@@ -3055,25 +3059,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1523706852
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1523706851}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60e55f4376d6107459631000058d7026, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraTransform: {fileID: 330585546}
-  swordController: {fileID: 1786695799}
-  playerHalfLength: 0.85
-  moveSpeed: 1.5
-  runningSpeed: 4.5
-  jumpForce: 5
-  gravity: 9.81
 --- !u!95 &1523706853
 Animator:
   serializedVersion: 4
@@ -3160,8 +3145,8 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1523706852}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+      - m_Target: {fileID: 1523706857}
+        m_TargetAssemblyTypeName: PlayerMovementController, Assembly-CSharp
         m_MethodName: OnMoveInput
         m_Mode: 0
         m_Arguments:
@@ -3179,6 +3164,78 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &1523706857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1523706851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5598bb237f2c0e4896914fa26efd623, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraTransform: {fileID: 330585546}
+  playerHalfLength: 0.85
+  moveSpeed: 5
+  runningSpeed: 5
+  acceleration: 10
+  deceleration: 20
+--- !u!114 &1523706858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1523706851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7e04679acaf6c14b9651805ae460a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1523706859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1523706851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55ed104187d9eea43b19d5b9ff1367b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  swordController: {fileID: 1786695799}
+--- !u!114 &1523706860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1523706851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 934889918ffd2364da7ce3ca7d630380, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerAnimationController: {fileID: 1523706858}
+  playerMovementController: {fileID: 1523706857}
+  playerAttackController: {fileID: 1523706859}
+  playerStatController: {fileID: 1523706861}
+--- !u!114 &1523706861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1523706851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 865c313feffdb7f4fb4441651feb89a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hp: 100
 --- !u!1 &1525977985
 GameObject:
   m_ObjectHideFlags: 0
