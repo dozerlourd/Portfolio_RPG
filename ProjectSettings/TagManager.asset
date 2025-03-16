@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - t_Player
+  - t_Enemy
   layers:
   - Default
   - TransparentFX
@@ -13,10 +15,10 @@ TagManager:
   - UI
   - Ground
   - 
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - Sword
+  - Shield
   - 
   - 
   - 

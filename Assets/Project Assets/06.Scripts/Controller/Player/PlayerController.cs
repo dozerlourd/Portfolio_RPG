@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviour
     private float deceleration = 20f;
     private float velocityRef = 0f;     // Reference value of SmoothDamp
 
+    int attackNum = 0;
+
     private int isAnimEnd = 1;
     private int isNotSpecificAnimation = 1;
     private bool canNextBehaviour = true;
@@ -161,10 +163,59 @@ public class PlayerController : MonoBehaviour
     {
         isAnimEnd = 0;
         canNextBehaviour = false;
-        anim.SetTrigger($"ToAttack_{Random.Range(1, 4)}");
+
+        int attackNum = Random.Range(0, 4);
+        anim.SetTrigger($"ToAttack_{attackNum + 1}");
+        
+        if (attackNum + 1 == 4)
+        {
+            StartCoroutine(AttackForwardMovement());
+        }
 
         yield return new WaitUntil(() => isAnimEnd == 1);
+        //attackNum = ((attackNum + 1) % 4);
         canNextBehaviour = true;
+    }
+
+    IEnumerator AttackForwardMovement()
+    {
+        yield return new WaitForSeconds(0.06f);
+
+        float elapsedTime = 0f;
+        float duration = 0.35f;
+        Vector3 startPosition = transform.position;
+        Vector3 targetPosition = transform.position + transform.forward * 1.5f; // 1만큼 전진
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / duration; // 0에서 1로 부드럽게 증가
+
+            // 비등속 전진 (Ease-out 효과)
+            float easedT = Mathf.Sin(t * Mathf.PI * 0.5f);
+            transform.position = Vector3.Lerp(startPosition, targetPosition, easedT);
+
+            yield return null;
+        }
+
+        elapsedTime = 0f;
+        duration = 0.3f;
+        startPosition = transform.position;
+        targetPosition = transform.position + transform.forward * 2f; // 1만큼 전진
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / duration; // 0에서 1로 부드럽게 증가
+
+            // 비등속 전진 (Ease-out 효과)
+            float easedT = Mathf.Sin(t * Mathf.PI * 0.5f);
+            transform.position = Vector3.Lerp(startPosition, targetPosition, easedT);
+
+            yield return null;
+        }
+
+        transform.position = targetPosition; // 정확한 목표 위치로 이동
     }
 
     IEnumerator JumpRoutine()
