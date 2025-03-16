@@ -3,18 +3,18 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] Transform target;  // 따라갈 캐릭터
-    [SerializeField] Vector3 offset = new Vector3(0f, 1.5f, -3f); // 기본 거리
-    [SerializeField] float rotationSpeed = 2f; // 회전 속도
-    [SerializeField] float zoomSpeed = 2f; // 줌 속도
-    [SerializeField] float minZoom = -1.5f; // 최소 줌 거리
-    [SerializeField] float maxZoom = -5f; // 최대 줌 거리
+    [SerializeField] Transform target;  // a character to follow
+    [SerializeField] Vector3 offset = new Vector3(0f, 1.5f, -3f); // basic distance
+    [SerializeField] float rotationSpeed = 2f; // rotation speed
+    [SerializeField] float zoomSpeed = 2f; // zoom speed
+    [SerializeField] float minZoom = -1.5f; // min zoom speed
+    [SerializeField] float maxZoom = -5f; // max zoom speed
 
     private float currentX = 0f;
     private float currentY = 0f;
     private float distance;
-    private Vector2 lookInput = Vector2.zero; // 마우스 입력 값
-    private float zoomInput = 0f; // 줌 입력 값
+    private Vector2 lookInput = Vector2.zero; // mouse input value
+    private float zoomInput = 0f; // zoom input value
 
     private void Start()
     {

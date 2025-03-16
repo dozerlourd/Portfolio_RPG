@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Windows;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class PlayerController : MonoBehaviour
     private InputAction moveAction;
 
     [SerializeField] private Transform cameraTransform;
+    [SerializeField] private SwordController swordController;
+    private Collider swordCollider;
 
     [SerializeField] private float playerHalfLength;
 
@@ -49,6 +52,12 @@ public class PlayerController : MonoBehaviour
         characterTr = transform;
         anim = characterTr.GetComponent<Animator>();
         characterController = characterTr.GetComponent<CharacterController>();
+        swordCollider = swordController.GetComponent<Collider>();
+    }
+
+    private void Start()
+    {
+        swordCollider.enabled = false;
     }
 
     void Update()
@@ -73,7 +82,7 @@ public class PlayerController : MonoBehaviour
         {
             currentMoveSpeed = Mathf.SmoothDamp(currentMoveSpeed, moveSpeed + currentRunningSpeed, ref velocityRef, 1f / acceleration);
         }
-        else //if(isNotSpecificAnimation == 1 && (inputDirection.magnitude > 0f || currentMoveSpeed > 0))
+        else
         {
             currentMoveSpeed = Mathf.SmoothDamp(currentMoveSpeed, 0f, ref velocityRef, 1f / deceleration);
         }
@@ -161,10 +170,12 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator AttackRoutine()
     {
+        swordCollider.enabled = true;
         isAnimEnd = 0;
         canNextBehaviour = false;
 
-        int attackNum = Random.Range(0, 4);
+        //int attackNum = Random.Range(0, 4);
+        int attackNum = 3;
         anim.SetTrigger($"ToAttack_{attackNum + 1}");
         
         if (attackNum + 1 == 4)
@@ -175,6 +186,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitUntil(() => isAnimEnd == 1);
         //attackNum = ((attackNum + 1) % 4);
         canNextBehaviour = true;
+        swordCollider.enabled = false;
     }
 
     IEnumerator AttackForwardMovement()
@@ -184,12 +196,12 @@ public class PlayerController : MonoBehaviour
         float elapsedTime = 0f;
         float duration = 0.35f;
         Vector3 startPosition = transform.position;
-        Vector3 targetPosition = transform.position + transform.forward * 1.5f; // 1만큼 전진
+        Vector3 targetPosition = transform.position + transform.forward * 0.75f; // Move forward
 
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            float t = elapsedTime / duration; // 0에서 1로 부드럽게 증가
+            float t = elapsedTime / duration; // smoothly increase from 0 to 1
 
             // 비등속 전진 (Ease-out 효과)
             float easedT = Mathf.Sin(t * Mathf.PI * 0.5f);
@@ -201,12 +213,12 @@ public class PlayerController : MonoBehaviour
         elapsedTime = 0f;
         duration = 0.3f;
         startPosition = transform.position;
-        targetPosition = transform.position + transform.forward * 2f; // 1만큼 전진
+        targetPosition = transform.position + transform.forward * 2f; // Move forward
 
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            float t = elapsedTime / duration; // 0에서 1로 부드럽게 증가
+            float t = elapsedTime / duration; // smoothly increase from 0 to 1
 
             // 비등속 전진 (Ease-out 효과)
             float easedT = Mathf.Sin(t * Mathf.PI * 0.5f);
@@ -215,7 +227,7 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
 
-        transform.position = targetPosition; // 정확한 목표 위치로 이동
+        transform.position = targetPosition; // Move to the correct target position
     }
 
     IEnumerator JumpRoutine()
@@ -229,8 +241,6 @@ public class PlayerController : MonoBehaviour
     }
 
     public void SetAnimEnd(int num) => isAnimEnd = num;
-    public void SetIsNotSpecificAnimation(int num)
-    {
-        isNotSpecificAnimation = num;
-    }
+    public void SetIsNotSpecificAnimation(int num) => isNotSpecificAnimation = num;
+    public void SetCanAttack(int num) => swordController.canAttack = num;
 }
