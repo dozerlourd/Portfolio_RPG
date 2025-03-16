@@ -2,16 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SwordControler : MonoBehaviour
+public class SwordController : MonoBehaviour
 {
-
+    public int canAttack = 1;
 
     private void OnTriggerEnter(Collider col)
     {
-        print(col.gameObject.name);
-        if (col.gameObject.tag.Contains("Enemy"))
+        if (col.gameObject.tag.Contains("Enemy") && canAttack == 1)
         {
             print("Damage");
+
         }
     }
 }

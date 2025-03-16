@@ -1431,9 +1431,9 @@ GameObject:
   - component: {fileID: 616486556}
   - component: {fileID: 616486555}
   - component: {fileID: 616486559}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Capsule
-  m_TagString: Untagged
+  m_TagString: t_Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3050,7 +3050,7 @@ GameObject:
   - component: {fileID: 1523706856}
   m_Layer: 8
   m_Name: Paladin Knight
-  m_TagString: Untagged
+  m_TagString: t_Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3068,6 +3068,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 330585546}
+  swordController: {fileID: 1786695799}
   playerHalfLength: 0.85
   moveSpeed: 1.5
   runningSpeed: 4.5
@@ -3803,6 +3804,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a43d110cbd6d2042b6480342d7cf4ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canAttack: 1
 --- !u!1 &1887846344
 GameObject:
   m_ObjectHideFlags: 0
