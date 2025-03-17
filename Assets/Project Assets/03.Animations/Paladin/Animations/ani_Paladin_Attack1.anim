@@ -73228,14 +73228,14 @@ AnimationClip:
     floatParameter: 0
     intParameter: 1
     messageOptions: 0
-  - time: 1.0333333
+  - time: 1.0666667
     functionName: SetAnimEnd
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 1
     messageOptions: 0
-  - time: 1.1
+  - time: 1.1666666
     functionName: SetCanAttack
     data: 
     objectReferenceParameter: {fileID: 0}
