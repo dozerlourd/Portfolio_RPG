@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovementController : MonoBehaviour
 {
     Animator anim;
-    PlayerStatController playerStatController;
+    PlayerMainController playerMainController;
     CharacterController characterController;
     public Transform cameraTransform;
 
@@ -33,9 +33,9 @@ public class PlayerMovementController : MonoBehaviour
         anim.SetBool("IsGrounded", CheckToGrounded());
         GetCameraDirectionExceptY();
 
-        if (!(playerStatController.CanNextBehaviour && (playerStatController.IsAnimEnd == 1))) return;
+        if (!(playerMainController.CanNextBehaviour && (playerMainController.IsAnimEnd == 1))) return;
 
-        bool isMoving = inputDirection.magnitude > 0f && playerStatController.CanNextBehaviour;
+        bool isMoving = inputDirection.magnitude > 0f && playerMainController.CanNextBehaviour;
 
         if (isMoving)
         {
@@ -102,5 +102,5 @@ public class PlayerMovementController : MonoBehaviour
         anim.SetFloat("Vertical", inputDirection.normalized.z);
     }
 
-    public void SetPlayerStatController(PlayerStatController pVariables) => playerStatController = pVariables;
+    public void SetPlayerMainController(PlayerMainController pVariables) => playerMainController = pVariables;
 }

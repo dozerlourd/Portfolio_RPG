@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerAttackController : MonoBehaviour
 {
     Animator anim;
-    PlayerStatController playerStatController;
+    PlayerMainController playerMainController;
     public SwordController swordController;
     private Collider swordCollider;
 
@@ -24,7 +24,7 @@ public class PlayerAttackController : MonoBehaviour
 
     public void HandleAttack()
     {
-        if (playerStatController.IsAnimEnd == 1)
+        if (playerMainController.IsAnimEnd == 1)
         {
             if (Co_attackRoutine != null) {
                 StopCoroutine(Co_attackRoutine);
@@ -36,8 +36,8 @@ public class PlayerAttackController : MonoBehaviour
     IEnumerator AttackRoutine()
     {
         swordCollider.enabled = true;
-        playerStatController.IsAnimEnd = 0;
-        playerStatController.CanNextBehaviour = false;
+        playerMainController.IsAnimEnd = 0;
+        playerMainController.CanNextBehaviour = false;
 
         int attackNum = Random.Range(0, 4);
         anim.SetTrigger($"ToAttack_{attackNum + 1}");
@@ -47,10 +47,11 @@ public class PlayerAttackController : MonoBehaviour
             StartCoroutine(AttackForwardMovement());
         }
 
-        yield return new WaitUntil(() => playerStatController.IsAnimEnd == 1);
+        yield return new WaitUntil(() => playerMainController.IsAnimEnd == 1);
         anim.SetBool("IsMove", CheckMoveInput());
         yield return new WaitForSeconds(0.35f);
-        playerStatController.CanNextBehaviour = true;
+        anim.SetBool("IsMove", CheckMoveInput());
+        playerMainController.CanNextBehaviour = true;
         swordCollider.enabled = false;
     }
 
@@ -99,8 +100,8 @@ public class PlayerAttackController : MonoBehaviour
         return isWPressed || isAPressed || isSPressed || isDPressed;
     }
 
-    public void SetAnimEnd(int num) => playerStatController.IsAnimEnd = num;
+    public void SetAnimEnd(int num) => playerMainController.IsAnimEnd = num;
     public void SetCanAttack(int num) => swordController.canAttack = num;
 
-    public void SetPlayerStatController(PlayerStatController pVariables) => playerStatController = pVariables;
+    public void SetPlayerMainController(PlayerMainController pVariables) => playerMainController = pVariables;
 }

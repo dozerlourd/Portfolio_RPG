@@ -9,13 +9,17 @@ public class PlayerMainController : MonoBehaviour
     [SerializeField] PlayerMovementController playerMovementController;
     [SerializeField] PlayerAttackController playerAttackController;
 
-    [SerializeField] PlayerStatController playerStatController;
+    private bool canNextBehaviour = true;
+    private int isAnimEnd = 1;
+
+    public bool CanNextBehaviour { get => canNextBehaviour; set => canNextBehaviour = value; }
+    public int IsAnimEnd { get => isAnimEnd; set => isAnimEnd = value; }
 
     private void Start()
     {
-        playerAnimationController.SetPlayerStatController(playerStatController);
-        playerMovementController.SetPlayerStatController(playerStatController);
-        playerAttackController.SetPlayerStatController(playerStatController);
+        playerAnimationController.SetPlayerMainController(this);
+        playerMovementController.SetPlayerMainController(this);
+        playerAttackController.SetPlayerMainController(this);
     }
 
     private void Update()

@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerAnimationController : MonoBehaviour
 {
     Animator anim;
-    PlayerStatController playerStatController;
+    PlayerMainController playerMainController;
 
     public Coroutine Co_blockRoutine { get; private set; }
     public Coroutine Co_jumpRoutine { get; private set; }
@@ -14,7 +14,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     public void HandleJump()
     {
-        if (playerStatController.CanNextBehaviour)
+        if (playerMainController.CanNextBehaviour)
         {
             Co_jumpRoutine = StartCoroutine(JumpRoutine());
         }
@@ -22,7 +22,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     public void HandleBlock()
     {
-        if (playerStatController.CanNextBehaviour)
+        if (playerMainController.CanNextBehaviour)
         {
             Co_blockRoutine = StartCoroutine(ShieldBlockingRoutine());
         }
@@ -31,25 +31,25 @@ public class PlayerAnimationController : MonoBehaviour
     IEnumerator ShieldBlockingRoutine()
     {
         anim.SetBool("IsMove", false);
-        playerStatController.IsAnimEnd = 0;
-        playerStatController.CanNextBehaviour = false;
+        playerMainController.IsAnimEnd = 0;
+        playerMainController.CanNextBehaviour = false;
         anim.SetTrigger("ToBlocking");
-        yield return new WaitUntil(() => playerStatController.IsAnimEnd == 1);
+        yield return new WaitUntil(() => playerMainController.IsAnimEnd == 1);
         yield return new WaitForSeconds(0.3f);
-        playerStatController.CanNextBehaviour = true;
+        playerMainController.CanNextBehaviour = true;
     }
 
     IEnumerator JumpRoutine()
     {
-        playerStatController.IsAnimEnd = 0;
-        playerStatController.CanNextBehaviour = false;
+        playerMainController.IsAnimEnd = 0;
+        playerMainController.CanNextBehaviour = false;
         anim.SetTrigger("ToJump");
-        yield return new WaitUntil(() => playerStatController.IsAnimEnd == 1);
+        yield return new WaitUntil(() => playerMainController.IsAnimEnd == 1);
         yield return new WaitForSeconds(0.3f);
-        playerStatController.CanNextBehaviour = true;
+        playerMainController.CanNextBehaviour = true;
     }
 
-    public void SetPlayerStatController(PlayerStatController pVariables) => playerStatController = pVariables;
+    public void SetPlayerMainController(PlayerMainController pmController) => playerMainController = pmController;
 
-    public void SetAnimEnd(int num) => playerStatController.IsAnimEnd = num;
+    public void SetAnimEnd(int num) => playerMainController.IsAnimEnd = num;
 }
