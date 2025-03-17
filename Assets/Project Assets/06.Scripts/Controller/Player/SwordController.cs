@@ -11,7 +11,7 @@ public class SwordController : MonoBehaviour
     {
         if (col.gameObject.tag.Contains("Enemy") && canAttack == 1)
         {
-            col.GetComponent<EnemyStatController>().TakeDamage(weaponDamage);
+            col.transform.parent.GetComponent<EnemyStatController>().TakeDamage(weaponDamage);
         }
     }
 
