@@ -2151,8 +2151,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 1523706855}
   patrolRadius: 50
-  alertRadius: 22
-  chaseRadius: 15
+  alertRadius: 16
+  chaseRadius: 12
   speed: 2.5
   nextWaypointDistance: 1.5
   currentState: 0
@@ -3366,7 +3366,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 330585546}
   playerHalfLength: 0.85
-  moveSpeed: 5
+  moveSpeed: 2
   runningSpeed: 5
   acceleration: 10
   deceleration: 20
