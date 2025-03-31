@@ -6,19 +6,28 @@ public enum EnemyState
 {
     Patrol,
     Alert,
-    Chase
+    Chase,
+    Attack
 }
 
 public class EnemyMovementController : MonoBehaviour
 {
+    [SerializeField] EnemyMainController enemyMainController;
+
+    public EnemyState currentState = EnemyState.Patrol;
     public Transform target;
     public float patrolRadius = 10f;
     public float alertRadius = 5f;
     public float chaseRadius = 3f;
-    public float speed = 5f;
+    public float attackRadius = 2.5f;
+    public float patrolSpeed = 3f;
+    public float chaseSpeed = 6f;
     public float nextWaypointDistance = 1f;
 
-    public EnemyState currentState = EnemyState.Patrol;
+    [Header("회전 기능 설정")]
+    [SerializeField] private float rotationSpeed = 5f;
+    private Vector3 previousPosition;
+
     private List<Node> path;
     private int currentWaypoint = 0;
     private AStar aStar;
@@ -29,23 +38,48 @@ public class EnemyMovementController : MonoBehaviour
     {
         aStar = FindObjectOfType<AStar>();
         GeneratePatrolPoints();
+        previousPosition = transform.position;
+        StartCoroutine(DADADADAD());
     }
 
     void Update()
     {
-        float distanceToTarget = Vector3.Distance(transform.position, target.position);
-
-        switch (currentState)
+        Vector3 movement = transform.position - previousPosition;
+        if(movement.magnitude > 0.001f)
         {
-            case EnemyState.Patrol:
-                Patrol(distanceToTarget);
-                break;
-            case EnemyState.Alert:
-                Alert(distanceToTarget);
-                break;
-            case EnemyState.Chase:
-                Chase(distanceToTarget);
-                break;
+            Vector3 moveDir = movement.normalized;
+            Quaternion targetRotation = Quaternion.LookRotation(moveDir);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+        previousPosition = transform.position;
+    }
+
+    IEnumerator DADADADAD()
+    {
+        yield return new WaitUntil(() => enemyMainController.EnemyMovementController != null);
+
+        while(true)
+        {
+            yield return new WaitUntil(() => !enemyMainController.IsAttacking && enemyMainController.AnimationIsEnd == 1);
+
+            float distanceToTarget = Vector3.Distance(transform.position, target.position);
+
+            switch (currentState)
+            {
+                case EnemyState.Patrol:
+                    Patrol(distanceToTarget);
+                    break;
+                case EnemyState.Alert:
+                    Alert(distanceToTarget);
+                    break;
+                case EnemyState.Chase:
+                    Chase(distanceToTarget);
+                    break;
+                case EnemyState.Attack:
+                    Attack(distanceToTarget);
+                    break;
+            }
+            yield return null;
         }
     }
 
@@ -68,7 +102,7 @@ public class EnemyMovementController : MonoBehaviour
             currentPatrolPoint = 0;
         }
 
-        transform.position = Vector3.MoveTowards(transform.position, patrolPoints[currentPatrolPoint], speed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, patrolPoints[currentPatrolPoint], patrolSpeed * Time.deltaTime);
 
         if (Vector3.Distance(transform.position, patrolPoints[currentPatrolPoint]) < nextWaypointDistance)
         {
@@ -93,6 +127,12 @@ public class EnemyMovementController : MonoBehaviour
 
     void Chase(float distanceToTarget)
     {
+        if (distanceToTarget <= attackRadius)
+        {
+            currentState = EnemyState.Attack;
+            return;
+        }
+
         if (distanceToTarget > chaseRadius)
         {
             currentState = EnemyState.Alert;
@@ -110,11 +150,20 @@ public class EnemyMovementController : MonoBehaviour
             return;
         }
 
-        transform.position = Vector3.MoveTowards(transform.position, path[currentWaypoint].worldPosition, speed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, path[currentWaypoint].worldPosition, chaseSpeed * Time.deltaTime);
 
         if (Vector3.Distance(transform.position, path[currentWaypoint].worldPosition) < nextWaypointDistance)
         {
             currentWaypoint++;
+        }
+    }
+
+    void Attack(float distanceToTarget)
+    {
+        if (distanceToTarget > attackRadius)
+        {
+            currentState = EnemyState.Chase;
+            return;
         }
     }
 

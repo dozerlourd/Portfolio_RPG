@@ -31,7 +31,6 @@ public class PlayerMovementController : MonoBehaviour
     public void UpdateMovement()
     {
         anim.SetBool("IsGrounded", CheckToGrounded());
-        GetCameraDirectionExceptY();
 
         if (!(playerMainController.CanNextBehaviour && (playerMainController.IsAnimEnd == 1))) return;
 
@@ -49,6 +48,11 @@ public class PlayerMovementController : MonoBehaviour
         MovePlayer();
         CheckToRunning();
         UpdateMoveAnimation(isMoving);
+    }
+
+    private void LateUpdate()
+    {
+        GetCameraDirectionExceptY();
     }
 
     private void CheckToRunning()
