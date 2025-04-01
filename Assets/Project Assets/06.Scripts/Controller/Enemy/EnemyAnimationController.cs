@@ -7,6 +7,8 @@ public class EnemyAnimationController : MonoBehaviour
     Animator animator;
     [SerializeField] EnemyMainController enemyMainController;
 
+    Coroutine Co_handleEnemyAnimation;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -14,7 +16,18 @@ public class EnemyAnimationController : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(HandleEnemyAnimation());
+        Co_handleEnemyAnimation = StartCoroutine(HandleEnemyAnimation());
+    }
+
+    private void Update()
+    {
+        if(enemyMainController.IsDead)
+        {
+            if (Co_handleEnemyAnimation != null)
+            {
+                StopCoroutine(Co_handleEnemyAnimation);
+            }
+        }
     }
 
     IEnumerator HandleEnemyAnimation()
@@ -62,5 +75,12 @@ public class EnemyAnimationController : MonoBehaviour
         animator.SetBool("IsIdle", false);
         animator.SetBool("IsDead", true);
         animator.SetTrigger("ToDying");
+    }
+
+    public void PlayDamagedAnimation()
+    {
+        animator.SetBool("IsWalking", false);
+        animator.SetBool("IsIdle", false);
+        animator.SetTrigger("ToDamaged");
     }
 }

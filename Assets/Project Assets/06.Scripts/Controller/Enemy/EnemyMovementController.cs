@@ -7,7 +7,8 @@ public enum EnemyState
     Patrol,
     Alert,
     Chase,
-    Attack
+    Attack,
+    Damaged
 }
 
 public class EnemyMovementController : MonoBehaviour
@@ -24,6 +25,8 @@ public class EnemyMovementController : MonoBehaviour
     public float chaseSpeed = 6f;
     public float nextWaypointDistance = 1f;
 
+    [SerializeField] float damageStunTime = 1;
+
     [Header("회전 기능 설정")]
     [SerializeField] private float rotationSpeed = 5f;
     private Vector3 previousPosition;
@@ -34,34 +37,52 @@ public class EnemyMovementController : MonoBehaviour
     private List<Vector3> patrolPoints = new List<Vector3>();
     private int currentPatrolPoint = 0;
 
+    private float damageElapseTime = 0;
+    
+
+    Coroutine Co_moveRoutine;
+    Coroutine Co_damageCheckRoutine;
+
     void Start()
     {
         aStar = FindObjectOfType<AStar>();
         GeneratePatrolPoints();
         previousPosition = transform.position;
-        StartCoroutine(DADADADAD());
+        Co_moveRoutine = StartCoroutine(MoveStateRoutine());
     }
 
     void Update()
     {
-        Vector3 movement = transform.position - previousPosition;
-        if(movement.magnitude > 0.001f)
+        if (enemyMainController.IsDead)
         {
-            Vector3 moveDir = movement.normalized;
-            Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            if(Co_moveRoutine != null)
+                StopCoroutine(Co_moveRoutine);
         }
-        previousPosition = transform.position;
+        else
+        {
+            Vector3 movement = transform.position - previousPosition;
+            if(movement.magnitude > 0.001f)
+            {
+                Vector3 moveDir = movement.normalized;
+                Quaternion targetRotation = Quaternion.LookRotation(moveDir);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
+            previousPosition = transform.position;
+        }
+
     }
 
-    IEnumerator DADADADAD()
+    IEnumerator MoveStateRoutine()
     {
         yield return new WaitUntil(() => enemyMainController.EnemyMovementController != null);
 
         while(true)
         {
+            if(currentState == EnemyState.Damaged)
+            {
+                enemyMainController.SetAnimationIsEnd(1);
+            }
             yield return new WaitUntil(() => !enemyMainController.IsAttacking && enemyMainController.AnimationIsEnd == 1);
-
             float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
             switch (currentState)
@@ -77,6 +98,11 @@ public class EnemyMovementController : MonoBehaviour
                     break;
                 case EnemyState.Attack:
                     Attack(distanceToTarget);
+                    break;
+                case EnemyState.Damaged:
+                    Co_damageCheckRoutine = StartCoroutine(CheckToDamagedEnd());
+                    enemyMainController.SetIsAttacking(false);
+                    yield return Co_damageCheckRoutine;
                     break;
             }
             yield return null;
@@ -167,6 +193,18 @@ public class EnemyMovementController : MonoBehaviour
         }
     }
 
+    IEnumerator CheckToDamagedEnd()
+    {
+        while(damageElapseTime < damageStunTime)
+        {
+            float deltaTime = Time.deltaTime;
+            damageElapseTime += deltaTime;
+            yield return new WaitForSeconds(deltaTime);
+        }
+
+        currentState = EnemyState.Patrol;
+    }
+
     void UpdatePath()
     {
         path = aStar.FindPath(transform.position, target.position);
@@ -184,4 +222,7 @@ public class EnemyMovementController : MonoBehaviour
             patrolPoints.Add(randomDirection);
         }
     }
+
+    public void SetEnemyState(EnemyState nextState) => currentState = nextState;
+    public void InitDamageElapseTime() => damageElapseTime = 0;
 }

@@ -12,9 +12,22 @@ public class EnemyAttackController : MonoBehaviour
     private bool isAttacking = false;
 
     public EnemyAnimationController animationController;
+    public EnemyMainController enemyMainController;
+
+    Coroutine Co_CheckAttackDelayRoutine;
 
     void Update()
     {
+        if (enemyMainController.IsDead)
+        {
+            if(Co_CheckAttackDelayRoutine != null)
+            {
+                StopCoroutine(Co_CheckAttackDelayRoutine);
+            }
+
+            return;
+        }
+
         if (isAttacking)
         {
             return;
@@ -28,7 +41,7 @@ public class EnemyAttackController : MonoBehaviour
             return;
         }
 
-        StartCoroutine(CheckAttackDelayRoutine());
+        Co_CheckAttackDelayRoutine = StartCoroutine(CheckAttackDelayRoutine());
     }
 
     IEnumerator CheckAttackDelayRoutine()

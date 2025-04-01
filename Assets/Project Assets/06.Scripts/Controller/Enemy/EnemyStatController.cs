@@ -16,10 +16,19 @@ public class EnemyStatController : MonoBehaviour
 
     public void TakeDamage(float dmg)
     {
+        if (hp <= 0) return;
+
         hp -= dmg;
+
         if (hp <= 0)
         {
             enemyMainController.EnemyAnimationController.PlayDyingAnimation();
+        }
+        else
+        {
+            enemyMainController.EnemyAnimationController.PlayDamagedAnimation();
+            enemyMainController.EnemyMovementController.SetEnemyState(EnemyState.Damaged);
+            enemyMainController.EnemyMovementController.InitDamageElapseTime();
         }
     }
 }

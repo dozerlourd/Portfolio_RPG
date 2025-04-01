@@ -7,11 +7,16 @@ public class SwordController : MonoBehaviour
     public int canAttack = 1;
     private float weaponDamage = 1;
 
+    private void Start()
+    {
+        SetWeaponDamage(5);
+    }
+
     private void OnTriggerEnter(Collider col)
     {
         if (col.gameObject.tag.Contains("Enemy") && canAttack == 1)
         {
-            col.transform.parent.GetComponent<EnemyStatController>().TakeDamage(weaponDamage);
+            col.transform.GetComponent<EnemyStatController>().TakeDamage(weaponDamage);
         }
     }
 

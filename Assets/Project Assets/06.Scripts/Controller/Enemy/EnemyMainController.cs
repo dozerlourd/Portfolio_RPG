@@ -11,8 +11,12 @@ public class EnemyMainController : MonoBehaviour
 
     int animationIsEnd = 1;
     bool isAttacking = false;
+
+    bool isDead = false;
+
     public int AnimationIsEnd => animationIsEnd;
     public bool IsAttacking => isAttacking;
+    public bool IsDead => isDead;
 
     public EnemyStatController EnemyStatController => enemyStatController;
     public EnemyAttackController EnemyAttackController => enemyAttackController;
